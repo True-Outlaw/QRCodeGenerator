@@ -22,10 +22,23 @@ class EnterpriseQRCodeApp extends StatelessWidget {
           return MaterialApp(
             title: 'Enterprise QR Code Generator',
             debugShowCheckedModeBanner: false,
-            theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade800), useMaterial3: true),
-            darkTheme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue.shade400, brightness: Brightness.dark),
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0EA5E9), brightness: Brightness.light),
               useMaterial3: true,
+            ),
+            darkTheme: ThemeData(
+              scaffoldBackgroundColor: const Color(0xFF0A0F1D),
+              colorScheme: ColorScheme.fromSeed(
+                seedColor: const Color(0xFF0EA5E9),
+                brightness: Brightness.dark,
+                surface: const Color(0xFF131B2E),
+              ),
+              useMaterial3: true,
+              cardTheme: CardThemeData(
+                color: const Color(0xFF131B2E),
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
             ),
             themeMode: provider.themeMode,
             home: const QrGeneratorHomePage(),
@@ -47,18 +60,31 @@ class QrGeneratorHomePage extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade100,
       appBar: AppBar(
-        title: const Row(
-          children: [Icon(Icons.qr_code_2, size: 28), SizedBox(width: 12), Text('Enterprise QR Code Generator')],
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0EA5E9).withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.qr_code_2, size: 28, color: Color(0xFF0EA5E9)),
+            ),
+            const SizedBox(width: 12),
+            const Text('Enterprise QR Code Generator', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+          ],
         ),
-        elevation: 2,
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        elevation: 0,
+        backgroundColor: isDark ? const Color(0xFF131B2E) : Colors.white,
         actions: [
           IconButton(
             icon: Icon(
               provider.themeMode == ThemeMode.dark
                   ? Icons.light_mode
                   : (provider.themeMode == ThemeMode.light ? Icons.dark_mode : Icons.brightness_auto),
+              color: const Color(0xFF0EA5E9),
             ),
             tooltip: 'Theme: ${provider.themeMode.name}',
             onPressed: () {
@@ -71,47 +97,46 @@ class QrGeneratorHomePage extends StatelessWidget {
               }
             },
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
         ],
       ),
-      body: Container(
-        color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
-        child: isWide ? _buildWideLayout() : _buildNarrowLayout(),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: isWide ? _buildWideLayout() : SingleChildScrollView(child: _buildNarrowLayout()),
       ),
     );
   }
 
   Widget _buildWideLayout() {
-    return const Padding(
-      padding: EdgeInsets.all(24.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 3,
-            child: SingleChildScrollView(
-              child: Column(children: [ContentFormWidget(), SizedBox(height: 20), CustomizationPanel()]),
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: 3,
+          child: SingleChildScrollView(
+            child: Column(
+              children: const [ContentFormWidget(), SizedBox(height: 24), CustomizationPanel(), SizedBox(height: 24)],
             ),
           ),
-          SizedBox(width: 24),
-          Expanded(flex: 2, child: SingleChildScrollView(child: QrPreviewWidget())),
-        ],
-      ),
+        ),
+        const SizedBox(width: 24),
+        const Expanded(
+          flex: 2,
+          child: SingleChildScrollView(child: QrPreviewWidget()), // Fixed/sticky right preview panel
+        ),
+      ],
     );
   }
 
   Widget _buildNarrowLayout() {
-    return const SingleChildScrollView(
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          ContentFormWidget(),
-          SizedBox(height: 16),
-          CustomizationPanel(),
-          SizedBox(height: 16),
-          QrPreviewWidget(),
-        ],
-      ),
+    return const Column(
+      children: [
+        ContentFormWidget(),
+        SizedBox(height: 20),
+        CustomizationPanel(),
+        SizedBox(height: 20),
+        QrPreviewWidget(),
+      ],
     );
   }
 }

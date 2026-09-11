@@ -11,77 +11,198 @@ class ContentFormWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = Provider.of<QRProvider>(context);
     final config = provider.config;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      color: isDark ? const Color(0xFF131B2E) : Colors.white,
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              '1. Select Content Type & Enter Data',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0EA5E9),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          '1',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Flexible(
+                        child: Text(
+                          'Select Content Payload',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0EA5E9).withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: const Color(0xFF0EA5E9).withValues(alpha: 0.3)),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.verified, size: 14, color: Color(0xFF0EA5E9)),
+                      SizedBox(width: 6),
+                      Text(
+                        'High Compatibility',
+                        style: TextStyle(fontSize: 12, color: Color(0xFF0EA5E9), fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
+            const Padding(
+              padding: EdgeInsets.only(left: 36.0, top: 2),
+              child: Text(
+                'Choose data protocol encoded into the matrix',
+                style: TextStyle(fontSize: 13, color: Colors.grey),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Icon cards for types
+            SizedBox(
+              height: 85,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
                 children: QRType.values.map((type) {
                   final isSelected = config.type == type;
                   return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: ChoiceChip(
-                      label: Text(_getTypeName(type)),
-                      selected: isSelected,
-                      onSelected: (selected) {
-                        if (selected) {
-                          provider.updateField((c) => c.type = type);
-                        }
-                      },
+                    padding: const EdgeInsets.only(right: 12.0),
+                    child: InkWell(
+                      onTap: () => provider.updateField((c) => c.type = type),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        width: 95,
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? const Color(0xFF0EA5E9)
+                              : (isDark ? const Color(0xFF1A243D) : Colors.grey.shade100),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: isSelected ? const Color(0xFF0EA5E9) : Colors.transparent,
+                            width: 2,
+                          ),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _getTypeIcon(type),
+                              color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                              size: 24,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _getTypeName(type),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                              ),
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   );
                 }).toList(),
               ),
             ),
-            const SizedBox(height: 16),
-            _buildFormFields(provider, config),
+            const SizedBox(height: 24),
+            const Text(
+              'TARGET DESTINATION URL',
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
+            _buildFormFields(provider, config, isDark),
           ],
         ),
       ),
     );
   }
 
-  String _getTypeName(QRType type) {
+  IconData _getTypeIcon(QRType type) {
     switch (type) {
       case QRType.url:
-        return 'URL';
+        return Icons.link;
       case QRType.text:
-        return 'Text';
+        return Icons.text_fields;
       case QRType.wifi:
-        return 'Wi-Fi';
+        return Icons.wifi;
       case QRType.vcard:
-        return 'vCard';
+        return Icons.badge;
       case QRType.email:
-        return 'Email';
+        return Icons.email;
       case QRType.phone:
-        return 'Phone';
+        return Icons.phone;
       case QRType.location:
-        return 'Location';
+        return Icons.location_on;
     }
   }
 
-  Widget _buildFormFields(QRProvider provider, QRCodeConfig config) {
+  String _getTypeName(QRType type) {
+    switch (type) {
+      case QRType.url:
+        return 'URL Link';
+      case QRType.text:
+        return 'Plain Text';
+      case QRType.wifi:
+        return 'Wi-Fi Access';
+      case QRType.vcard:
+        return 'vCard 4.0';
+      case QRType.email:
+        return 'Email Mailto';
+      case QRType.phone:
+        return 'Phone / SMS';
+      case QRType.location:
+        return 'Geo Location';
+    }
+  }
+
+  Widget _buildFormFields(QRProvider provider, QRCodeConfig config, bool isDark) {
     switch (config.type) {
       case QRType.url:
         return TextFormField(
           initialValue: config.url,
-          decoration: const InputDecoration(
-            labelText: 'Website URL',
-            hintText: 'https://www.company.com',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.link),
+          style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+          decoration: InputDecoration(
+            hintText: 'https://www.example.com',
+            hintStyle: const TextStyle(color: Colors.grey),
+            filled: true,
+            fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+            prefixIcon: const Icon(Icons.lock, size: 18, color: Color(0xFF0EA5E9)),
+            suffixIcon: TextButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.open_in_new, size: 14),
+              label: const Text('Test Link', style: TextStyle(fontSize: 12)),
+            ),
           ),
           onChanged: (val) => provider.updateField((c) => c.url = val),
         );
@@ -89,11 +210,13 @@ class ContentFormWidget extends StatelessWidget {
         return TextFormField(
           initialValue: config.text,
           maxLines: 3,
-          decoration: const InputDecoration(
-            labelText: 'Plain Text / Message',
-            hintText: 'Enter company announcement or notes...',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.text_fields),
+          style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+          decoration: InputDecoration(
+            hintText: 'Enter plain text message...',
+            hintStyle: const TextStyle(color: Colors.grey),
+            filled: true,
+            fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
           ),
           onChanged: (val) => provider.updateField((c) => c.text = val),
         );
@@ -102,10 +225,12 @@ class ContentFormWidget extends StatelessWidget {
           children: [
             TextFormField(
               initialValue: config.wifiSsid,
-              decoration: const InputDecoration(
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
                 labelText: 'Network SSID (Name)',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.wifi),
+                filled: true,
+                fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               onChanged: (val) => provider.updateField((c) => c.wifiSsid = val),
             ),
@@ -113,17 +238,26 @@ class ContentFormWidget extends StatelessWidget {
             TextFormField(
               initialValue: config.wifiPassword,
               obscureText: true,
-              decoration: const InputDecoration(
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
                 labelText: 'Password',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.lock),
+                filled: true,
+                fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               onChanged: (val) => provider.updateField((c) => c.wifiPassword = val),
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: config.wifiEncryption,
-              decoration: const InputDecoration(labelText: 'Encryption', border: OutlineInputBorder()),
+              dropdownColor: isDark ? const Color(0xFF131B2E) : Colors.white,
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
+                labelText: 'Encryption',
+                filled: true,
+                fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+              ),
               items: ['WPA', 'WEP', 'nopass'].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
               onChanged: (val) {
                 if (val != null) provider.updateField((c) => c.wifiEncryption = val);
@@ -136,40 +270,48 @@ class ContentFormWidget extends StatelessWidget {
           children: [
             TextFormField(
               initialValue: config.vcardName,
-              decoration: const InputDecoration(
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
                 labelText: 'Full Name',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
+                filled: true,
+                fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               onChanged: (val) => provider.updateField((c) => c.vcardName = val),
             ),
             const SizedBox(height: 12),
             TextFormField(
               initialValue: config.vcardPhone,
-              decoration: const InputDecoration(
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
                 labelText: 'Phone Number',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.phone),
+                filled: true,
+                fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               onChanged: (val) => provider.updateField((c) => c.vcardPhone = val),
             ),
             const SizedBox(height: 12),
             TextFormField(
               initialValue: config.vcardEmail,
-              decoration: const InputDecoration(
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
                 labelText: 'Email Address',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.email),
+                filled: true,
+                fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               onChanged: (val) => provider.updateField((c) => c.vcardEmail = val),
             ),
             const SizedBox(height: 12),
             TextFormField(
               initialValue: config.vcardOrg,
-              decoration: const InputDecoration(
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
                 labelText: 'Company / Organization',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.business),
+                filled: true,
+                fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               onChanged: (val) => provider.updateField((c) => c.vcardOrg = val),
             ),
@@ -180,20 +322,24 @@ class ContentFormWidget extends StatelessWidget {
           children: [
             TextFormField(
               initialValue: config.emailTo,
-              decoration: const InputDecoration(
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
                 labelText: 'Recipient Email',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.mail),
+                filled: true,
+                fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               onChanged: (val) => provider.updateField((c) => c.emailTo = val),
             ),
             const SizedBox(height: 12),
             TextFormField(
               initialValue: config.emailSubject,
-              decoration: const InputDecoration(
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
                 labelText: 'Subject',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.subject),
+                filled: true,
+                fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               onChanged: (val) => provider.updateField((c) => c.emailSubject = val),
             ),
@@ -201,10 +347,12 @@ class ContentFormWidget extends StatelessWidget {
             TextFormField(
               initialValue: config.emailBody,
               maxLines: 2,
-              decoration: const InputDecoration(
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
                 labelText: 'Message Body',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.message),
+                filled: true,
+                fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
               ),
               onChanged: (val) => provider.updateField((c) => c.emailBody = val),
             ),
@@ -213,11 +361,13 @@ class ContentFormWidget extends StatelessWidget {
       case QRType.phone:
         return TextFormField(
           initialValue: config.phoneNum,
-          decoration: const InputDecoration(
+          style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+          decoration: InputDecoration(
             labelText: 'Phone Number',
             hintText: '+1234567890',
-            border: OutlineInputBorder(),
-            prefixIcon: Icon(Icons.phone),
+            filled: true,
+            fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
           ),
           onChanged: (val) => provider.updateField((c) => c.phoneNum = val),
         );
@@ -227,10 +377,13 @@ class ContentFormWidget extends StatelessWidget {
             Expanded(
               child: TextFormField(
                 initialValue: config.geoLat,
-                decoration: const InputDecoration(
+                style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                decoration: InputDecoration(
                   labelText: 'Latitude',
                   hintText: '37.7749',
-                  border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                 ),
                 onChanged: (val) => provider.updateField((c) => c.geoLat = val),
               ),
@@ -239,10 +392,13 @@ class ContentFormWidget extends StatelessWidget {
             Expanded(
               child: TextFormField(
                 initialValue: config.geoLng,
-                decoration: const InputDecoration(
+                style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                decoration: InputDecoration(
                   labelText: 'Longitude',
                   hintText: '-122.4194',
-                  border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
                 ),
                 onChanged: (val) => provider.updateField((c) => c.geoLng = val),
               ),
