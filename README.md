@@ -55,7 +55,7 @@ This project uses conditional compilation to maintain 100% feature parity on bot
 
 ### Clone & Install Dependencies
 ```bash
-git clone https://github.com/True-Outlaw/QRCodeGenerator.git
+git clone https://github.com/Outlawdlaw/QRCodeGenerator.git
 cd QRCodeGenerator
 flutter pub get
 ```
@@ -99,7 +99,7 @@ The cleanest way to deploy without committing build artifacts into your source t
 
 ## 📜 Terms of Use & License
 
-Copyright © 2026 Dillan Lawless. All rights reserved.
+Copyright © 2026 True Outlaw. All rights reserved.
 
 - **Free to Use:** You are free to use this application to generate, customize, and export QR codes for both personal and commercial purposes.
 - **Restrictions:** The source code, software design, and architecture are proprietary. You may not copy, replicate, modify, redistribute, publish, or sublicense this source code or application without explicit prior written authorization.
