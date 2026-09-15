@@ -1,11 +1,11 @@
 {
-    "name": "qr_code_generator",
-    "short_name": "qr_code_generator",
+    "name": "Enterprise QR Code Generator",
+    "short_name": "QR Generator",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0A0F1D",
+    "theme_color": "#0EA5E9",
+    "description": "Create, customize, and export enterprise-grade QR codes with custom colors, gradients, logos, frames, and high-resolution PNG/SVG vector formats.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
