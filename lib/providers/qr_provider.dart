@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/qr_config.dart';
+import '../platform/platform_io.dart';
 
 class QRProvider with ChangeNotifier {
   QRCodeConfig _config = QRCodeConfig();
@@ -105,8 +105,7 @@ class QRProvider with ChangeNotifier {
         bytes: Uint8List.fromList(bytes),
       );
       if (path != null) {
-        final file = File(path);
-        await file.writeAsBytes(bytes);
+        await writeFileBytes(path, Uint8List.fromList(bytes));
         return path;
       }
       return null;

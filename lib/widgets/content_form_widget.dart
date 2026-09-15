@@ -249,7 +249,7 @@ class ContentFormWidget extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              value: config.wifiEncryption,
+              initialValue: config.wifiEncryption,
               dropdownColor: isDark ? const Color(0xFF131B2E) : Colors.white,
               style: TextStyle(color: isDark ? Colors.white : Colors.black87),
               decoration: InputDecoration(

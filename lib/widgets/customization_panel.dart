@@ -52,12 +52,18 @@ class CustomizationPanel extends StatelessWidget {
                     ],
                   ),
                 ),
-                TextButton.icon(
+                 TextButton.icon(
                   onPressed: () {
                     provider.updateField((c) {
                       c.foregroundColor = Colors.black;
                       c.backgroundColor = Colors.white;
                       c.dotStyle = 'square';
+                      c.useGradient = false;
+                      c.gradientEndColor = const Color(0xFF0EA5E9);
+                      c.gradientDirection = 'diagonal';
+                      c.eyeShape = 'auto';
+                      c.eyeColor = null;
+                      c.eyeInnerColor = null;
                       c.frameText = null;
                       c.logoBytes = null;
                     });
@@ -70,66 +76,169 @@ class CustomizationPanel extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.only(left: 36.0, top: 2),
               child: Text(
-                'Configure geometry, color swatches, logo center-piece, and banner frame',
+                'Configure geometry, color palettes, gradients, finder eyes, logo, and banner frame',
                 style: TextStyle(fontSize: 13, color: Colors.grey),
               ),
             ),
             const SizedBox(height: 20),
 
-            // Color Swatches & Canvas
+            // Color Scheme & Gradient Mode Switcher
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'QR PATTERN COLOR',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.1,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      _buildColorPickerButton(
-                        context,
-                        'Pattern Color',
-                        config.foregroundColor,
-                        (color) => provider.updateField((c) => c.foregroundColor = color),
-                        isDark,
-                      ),
-                    ],
-                  ),
+                const Text(
+                  'COLOR PALETTE & FILL STYLE',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: Colors.grey),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'BACKGROUND CANVAS',
-                        style: TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.1,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      _buildColorPickerButton(
-                        context,
-                        'Background',
-                        config.backgroundColor,
-                        (color) => provider.updateField((c) => c.backgroundColor = color),
-                        isDark,
-                      ),
-                    ],
+                SegmentedButton<bool>(
+                  segments: const [
+                    ButtonSegment(value: false, label: Text('Solid', style: TextStyle(fontSize: 12))),
+                    ButtonSegment(value: true, label: Text('Gradient', style: TextStyle(fontSize: 12))),
+                  ],
+                  selected: {config.useGradient},
+                  onSelectionChanged: (val) {
+                    provider.updateField((c) => c.useGradient = val.first);
+                  },
+                  style: SegmentedButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    selectedBackgroundColor: const Color(0xFF0EA5E9).withValues(alpha: 0.2),
+                    selectedForegroundColor: const Color(0xFF0EA5E9),
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 12),
+
+            // Color Swatches
+            if (!config.useGradient) ...[
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Pattern Color', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        const SizedBox(height: 6),
+                        _buildColorPickerButton(
+                          context,
+                          'Pattern Color',
+                          config.foregroundColor,
+                          (color) => provider.updateField((c) => c.foregroundColor = color),
+                          isDark,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Background Canvas', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        const SizedBox(height: 6),
+                        _buildColorPickerButton(
+                          context,
+                          'Background',
+                          config.backgroundColor,
+                          (color) => provider.updateField((c) => c.backgroundColor = color),
+                          isDark,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ] else ...[
+              // Gradient options
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Gradient Start', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        const SizedBox(height: 6),
+                        _buildColorPickerButton(
+                          context,
+                          'Start Color',
+                          config.foregroundColor,
+                          (color) => provider.updateField((c) => c.foregroundColor = color),
+                          isDark,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Gradient End', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        const SizedBox(height: 6),
+                        _buildColorPickerButton(
+                          context,
+                          'End Color',
+                          config.gradientEndColor,
+                          (color) => provider.updateField((c) => c.gradientEndColor = color),
+                          isDark,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Gradient Direction', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        const SizedBox(height: 6),
+                        DropdownButtonFormField<String>(
+                          initialValue: config.gradientDirection,
+                          dropdownColor: isDark ? const Color(0xFF131B2E) : Colors.white,
+                          style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: 13),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade50,
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                            isDense: true,
+                          ),
+                          items: const [
+                            DropdownMenuItem(value: 'diagonal', child: Text('Diagonal (↘ Top-Left to Bottom-Right)')),
+                            DropdownMenuItem(value: 'horizontal', child: Text('Horizontal (➡ Left to Right)')),
+                            DropdownMenuItem(value: 'vertical', child: Text('Vertical (⬇ Top to Bottom)')),
+                            DropdownMenuItem(value: 'radial', child: Text('Radial (🔘 Center outward)')),
+                          ],
+                          onChanged: (val) {
+                            if (val != null) provider.updateField((c) => c.gradientDirection = val);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Background Canvas', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        const SizedBox(height: 6),
+                        _buildColorPickerButton(
+                          context,
+                          'Background',
+                          config.backgroundColor,
+                          (color) => provider.updateField((c) => c.backgroundColor = color),
+                          isDark,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 20),
 
             // Dot Style Cards
@@ -146,7 +255,7 @@ class CustomizationPanel extends StatelessWidget {
                     config,
                     'square',
                     'Classic Square',
-                    'Highest scan rate',
+                    'Geometric matrix',
                     Icons.grid_view,
                     isDark,
                   ),
@@ -158,7 +267,7 @@ class CustomizationPanel extends StatelessWidget {
                     config,
                     'rounded',
                     'Smooth Round',
-                    'Modern soft',
+                    'Connected fluid',
                     Icons.rounded_corner,
                     isDark,
                   ),
@@ -179,6 +288,80 @@ class CustomizationPanel extends StatelessWidget {
             ),
             const SizedBox(height: 24),
 
+            // Corner Finder Pattern (Eyes) Section
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'FINDER PATTERN (EYE SHAPES & ACCENTS)',
+                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: Colors.grey),
+                ),
+                if (config.eyeColor != null || config.eyeInnerColor != null)
+                  TextButton(
+                    onPressed: () {
+                      provider.updateField((c) {
+                        c.eyeColor = null;
+                        c.eyeInnerColor = null;
+                      });
+                    },
+                    child: const Text('Reset Eye Colors', style: TextStyle(fontSize: 11, color: Color(0xFF0EA5E9))),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _buildEyeShapeChip(provider, config, 'auto', 'Auto (Match)', Icons.auto_awesome, isDark),
+                _buildEyeShapeChip(provider, config, 'rounded', 'Squircle', Icons.crop_portrait_rounded, isDark),
+                _buildEyeShapeChip(provider, config, 'circular', 'Circular', Icons.radio_button_checked, isDark),
+                _buildEyeShapeChip(provider, config, 'square', 'Square', Icons.crop_square, isDark),
+                _buildEyeShapeChip(provider, config, 'leaf', 'Modern Leaf', Icons.eco, isDark),
+              ],
+            ),
+            const SizedBox(height: 14),
+
+            // Eye Accent Color Pickers
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Outer Eye Frame', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      const SizedBox(height: 6),
+                      _buildColorPickerButton(
+                        context,
+                        'Eye Frame',
+                        config.eyeColor ?? config.foregroundColor,
+                        (color) => provider.updateField((c) => c.eyeColor = color),
+                        isDark,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('Inner Eye Center Dot', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      const SizedBox(height: 6),
+                      _buildColorPickerButton(
+                        context,
+                        'Eye Center',
+                        config.eyeInnerColor ?? config.eyeColor ?? config.foregroundColor,
+                        (color) => provider.updateField((c) => c.eyeInnerColor = color),
+                        isDark,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+
             // Frame & Banner CTA
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -189,7 +372,7 @@ class CustomizationPanel extends StatelessWidget {
                 ),
                 Switch(
                   value: config.frameText != null,
-                  activeColor: const Color(0xFF0EA5E9),
+                  activeThumbColor: const Color(0xFF0EA5E9),
                   onChanged: (val) {
                     provider.updateField((c) => c.frameText = val ? 'SCAN ME FOR EXCLUSIVE OFFERS' : null);
                   },
@@ -392,7 +575,7 @@ class CustomizationPanel extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField<int>(
-              value: config.errorCorrectionLevel,
+              initialValue: config.errorCorrectionLevel,
               dropdownColor: isDark ? const Color(0xFF131B2E) : Colors.white,
               style: TextStyle(color: isDark ? Colors.white : Colors.black87),
               decoration: InputDecoration(
@@ -460,6 +643,31 @@ class CustomizationPanel extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildEyeShapeChip(
+    QRProvider provider,
+    QRCodeConfig config,
+    String shapeKey,
+    String title,
+    IconData icon,
+    bool isDark,
+  ) {
+    final isSelected = config.eyeShape == shapeKey;
+    return ChoiceChip(
+      avatar: Icon(icon, size: 16, color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.black87)),
+      label: Text(title, style: TextStyle(fontSize: 12, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+      selected: isSelected,
+      selectedColor: const Color(0xFF0EA5E9),
+      labelStyle: TextStyle(color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.black87)),
+      backgroundColor: isDark ? const Color(0xFF0A0F1D) : Colors.grey.shade100,
+      side: BorderSide(
+        color: isSelected ? const Color(0xFF0EA5E9) : Colors.grey.withValues(alpha: 0.2),
+      ),
+      onSelected: (selected) {
+        if (selected) provider.updateField((c) => c.eyeShape = shapeKey);
+      },
     );
   }
 

@@ -37,6 +37,17 @@ class QRCodeConfig {
   Color foregroundColor;
   Color backgroundColor;
   String dotStyle; // 'square', 'rounded', 'circular'
+
+  // Gradient
+  bool useGradient;
+  Color gradientEndColor;
+  String gradientDirection; // 'diagonal', 'vertical', 'horizontal', 'radial'
+
+  // Finder Pattern Eyes
+  String eyeShape; // 'auto', 'rounded', 'circular', 'square', 'leaf'
+  Color? eyeColor;
+  Color? eyeInnerColor;
+
   String? frameText; // e.g. "SCAN ME"
   Color frameColor;
   Color frameTextColor;
@@ -68,6 +79,12 @@ class QRCodeConfig {
     this.foregroundColor = Colors.black,
     this.backgroundColor = Colors.white,
     this.dotStyle = 'square',
+    this.useGradient = false,
+    Color? gradientEndColor,
+    this.gradientDirection = 'diagonal',
+    this.eyeShape = 'auto',
+    this.eyeColor,
+    this.eyeInnerColor,
     this.frameText,
     Color? frameColor,
     Color? frameTextColor,
@@ -77,7 +94,8 @@ class QRCodeConfig {
     this.logoBytes,
     this.logoSize = 45.0,
     this.errorCorrectionLevel = 1, // M
-  }) : frameColor = frameColor ?? Colors.blue,
+  }) : gradientEndColor = gradientEndColor ?? const Color(0xFF0EA5E9),
+       frameColor = frameColor ?? Colors.blue,
        frameTextColor = frameTextColor ?? Colors.white;
 
   String get generatedData {
@@ -119,6 +137,12 @@ class QRCodeConfig {
     Color? foregroundColor,
     Color? backgroundColor,
     String? dotStyle,
+    bool? useGradient,
+    Color? gradientEndColor,
+    String? gradientDirection,
+    String? eyeShape,
+    Color? eyeColor,
+    Color? eyeInnerColor,
     String? frameText,
     Color? frameColor,
     Color? frameTextColor,
@@ -149,6 +173,12 @@ class QRCodeConfig {
       foregroundColor: foregroundColor ?? this.foregroundColor,
       backgroundColor: backgroundColor ?? this.backgroundColor,
       dotStyle: dotStyle ?? this.dotStyle,
+      useGradient: useGradient ?? this.useGradient,
+      gradientEndColor: gradientEndColor ?? this.gradientEndColor,
+      gradientDirection: gradientDirection ?? this.gradientDirection,
+      eyeShape: eyeShape ?? this.eyeShape,
+      eyeColor: eyeColor ?? this.eyeColor,
+      eyeInnerColor: eyeInnerColor ?? this.eyeInnerColor,
       frameText: frameText ?? this.frameText,
       frameColor: frameColor ?? this.frameColor,
       frameTextColor: frameTextColor ?? this.frameTextColor,
@@ -181,6 +211,12 @@ class QRCodeConfig {
     'foregroundColor': foregroundColor.toARGB32(),
     'backgroundColor': backgroundColor.toARGB32(),
     'dotStyle': dotStyle,
+    'useGradient': useGradient,
+    'gradientEndColor': gradientEndColor.toARGB32(),
+    'gradientDirection': gradientDirection,
+    'eyeShape': eyeShape,
+    'eyeColor': eyeColor?.toARGB32(),
+    'eyeInnerColor': eyeInnerColor?.toARGB32(),
     'frameText': frameText,
     'frameColor': frameColor.toARGB32(),
     'frameTextColor': frameTextColor.toARGB32(),
@@ -211,6 +247,12 @@ class QRCodeConfig {
     foregroundColor: Color(json['foregroundColor'] ?? Colors.black.toARGB32()),
     backgroundColor: Color(json['backgroundColor'] ?? Colors.white.toARGB32()),
     dotStyle: json['dotStyle'] ?? 'square',
+    useGradient: json['useGradient'] ?? false,
+    gradientEndColor: Color(json['gradientEndColor'] ?? const Color(0xFF0EA5E9).toARGB32()),
+    gradientDirection: json['gradientDirection'] ?? 'diagonal',
+    eyeShape: json['eyeShape'] ?? 'auto',
+    eyeColor: json['eyeColor'] != null ? Color(json['eyeColor']) : null,
+    eyeInnerColor: json['eyeInnerColor'] != null ? Color(json['eyeInnerColor']) : null,
     frameText: json['frameText'],
     frameColor: Color(json['frameColor'] ?? Colors.blue.toARGB32()),
     frameTextColor: Color(json['frameTextColor'] ?? Colors.white.toARGB32()),
